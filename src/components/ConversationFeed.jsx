@@ -10,7 +10,9 @@ export default function ConversationFeed({ messages, stepList, activeIndex, isCo
   }, [activeIndex])
 
   const isEmpty = messages.length === 0 && !isLoading
-  const currentStep = activeIndex !== null ? stepList[activeIndex] : null
+  // When complete and not navigating, show last step; otherwise show active
+  const viewIndex = (isComplete && activeIndex === null) ? stepList.length - 1 : activeIndex
+  const currentStep = viewIndex !== null ? stepList[viewIndex] : null
 
   return (
     <div className="flex flex-col gap-8 py-10 min-h-full">
@@ -38,7 +40,7 @@ export default function ConversationFeed({ messages, stepList, activeIndex, isCo
         </div>
       )}
 
-      {currentStep && !isComplete && (
+      {currentStep && (
         <div ref={activeBubbleRef}>
           <StepBubble
             step={currentStep}

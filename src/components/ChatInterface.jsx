@@ -13,14 +13,14 @@ export default function ChatInterface() {
     loadSteps(prompt)
   }
 
-  const hasSteps = stepList.length > 0 && !isComplete
-  const canGoBack = hasSteps && activeIndex !== null && activeIndex > 0
-  const canGoForward = hasSteps && activeIndex !== null &&
-    activeIndex < stepList.length - 1 &&
-    stepList[activeIndex]?.done
+  const hasSteps = stepList.length > 0
+  // When complete and user hasn't navigated back, show last step; otherwise use activeIndex
+  const viewIndex = (isComplete && activeIndex === null) ? stepList.length - 1 : activeIndex
+  const canGoBack = hasSteps && viewIndex !== null && viewIndex > 0
+  const canGoForward = hasSteps && viewIndex !== null && viewIndex < stepList.length - 1
 
-  const goBack = () => goToStep(activeIndex - 1)
-  const goForward = () => goToStep(activeIndex + 1)
+  const goBack = () => goToStep((viewIndex ?? 0) - 1)
+  const goForward = () => goToStep((viewIndex ?? 0) + 1)
 
   // Keyboard navigation
   useEffect(() => {
@@ -92,7 +92,7 @@ export default function ChatInterface() {
                       if (i <= firstUndone || firstUndone === -1) goToStep(i)
                     }}
                     className={`rounded-full transition-all duration-200 ${
-                      i === activeIndex
+                      i === viewIndex
                         ? 'w-4 h-2.5 bg-white'
                         : s.done
                         ? 'w-2.5 h-2.5 bg-green-500 hover:bg-green-400'
@@ -102,7 +102,7 @@ export default function ChatInterface() {
                 ))}
               </div>
               <span className="text-xs text-gray-600">
-                Step {activeIndex + 1} of {stepList.length}
+                Step {viewIndex + 1} of {stepList.length}
               </span>
             </div>
 

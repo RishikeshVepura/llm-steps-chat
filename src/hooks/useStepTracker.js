@@ -85,14 +85,19 @@ export function useStepTracker() {
 
   // Navigate to a specific step index
   const goToStep = useCallback((targetIndex) => {
-    if (stepList.length === 0 || isComplete) return
+    if (stepList.length === 0) return
     if (targetIndex < 0 || targetIndex >= stepList.length) return
 
+    // When all steps are done, allow free navigation in both directions
+    if (isComplete) {
+      setActiveIndex(targetIndex)
+      return
+    }
+
     // Can only go forward if the current step is done
-    if (targetIndex > activeIndex && !stepList[activeIndex]?.done) return
+    if (activeIndex !== null && targetIndex > activeIndex && !stepList[activeIndex]?.done) return
 
     // Can only go forward up to the first undone step
-    // (can't skip ahead past undone steps)
     const furthestAllowed = stepList.findIndex((s) => !s.done)
     if (furthestAllowed !== -1 && targetIndex > furthestAllowed) return
 
